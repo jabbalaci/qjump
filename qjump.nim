@@ -37,6 +37,7 @@ import std/sequtils
 import std/sets
 import std/strformat
 import std/strutils
+import std/sugar
 import std/tables
 
 import helpers
@@ -48,7 +49,7 @@ proc myQuit(code: int) =
   quit(code)
 
 let
-  VERSION = "0.3.0"
+  VERSION = "0.3.1"
   HOME = getHomeDir().rstrip("/")
   DROPBOX = &"{HOME}/Dropbox"
   DB_FILE = &"{DROPBOX}/qjump.txt"
@@ -149,6 +150,7 @@ proc readDb(self: var Database) =
     inc line_number
     var e = Entry()
     e.parent = addr self
+    e.line = line
     if match(line.strip, pattern, matches):
       e.key = matches[0]
       e.path = matches[1].rstrip("/")
@@ -166,7 +168,6 @@ proc readDb(self: var Database) =
       # else:
       self.keys.incl(e.key)
     #
-    e.line = line  # store it only if the line is not a *key: path* line, i.e. something else
     self.entries.add(e)
 
 proc getAllKeys(self: Database): seq[string] =
@@ -175,17 +176,35 @@ proc getAllKeys(self: Database): seq[string] =
     if e.isKeyPath:
       result.add(e.key)
 
-proc findSimilarKeys(self: Database, key: string): seq[string] =
-  # Using the Levenstein distance.
+proc findSimilarKeysV1(self: Database, key: string): seq[string] =
+  # Using substring match. Return the top 3 similarities.
+  let key = key.toLower
+  for e in self.entries:
+    if e.isKeyPath and key in e.line.toLower:
+      result.add(e.key)
+    #
+  #
+  if result.len > 3: result[0 ..< 3] else: result
+
+proc findSimilarKeysV2(self: Database, key: string): seq[string] =
+  # Using the Levenstein distance. Return the top 3 similarities.
   func myCmp(s, t: string): int =
     editDistance(s, key) - editDistance(t, key)
   #
-  let keys = self.getAllKeys()
-  result = sorted(keys, myCmp)
+  let similar = sorted(self.getAllKeys(), myCmp)
+  if similar.len > 3: similar[0 ..< 3] else: similar
 
 proc getPath(self: Database, key: string): (string, Status) =
   # Having the key, return the corresponding path.
   # The status indicates if the key was found or not.
+  proc remove_duplicates(li: seq[string]): seq[string] =
+    # Return a copy that contains no duplicates and the order is kept.
+    for s in li:
+      if s notin result:
+        result.add(s)
+      #
+    #
+  #
   let key = key.split('/')[0]
   for e in self.entries:
     if e.isKeyPath and e.key == key:
@@ -193,12 +212,12 @@ proc getPath(self: Database, key: string): (string, Status) =
     #
   #
   stderr.writeLine("# no such bookmark")
+  var bookmarks: seq[string]
+  bookmarks.add(self.findSimilarKeysV1(key))  # max. 3 bookmarks are added
+  bookmarks.add(self.findSimilarKeysV2(key))  # max. 3 bookmarks are added
+  bookmarks = remove_duplicates(bookmarks)
   stderr.write("# similar bookmarks: ")
-  let tips = block:
-    let tmp = self.findSimilarKeys(key)
-    if tmp.len > 3: tmp[0 ..< 3] else: tmp
-  #
-  stderr.writeLine(tips.join(", "))
+  stderr.writeLine(bookmarks.join(", "))
   return (".", stNotFound)
 
 proc getUniqueHash(self: Database): string =

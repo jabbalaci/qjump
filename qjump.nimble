@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.0"
+version       = "0.3.1"
 author        = "Laszlo Szathmary <jabba.laci@gmail.com>"
 description   = "Bookmark directories on your local machine and switch between them easily"
 license       = "MIT"
