@@ -72,5 +72,5 @@ Links
 
 * [QuickJump](https://github.com/jabbalaci/quickjump) is the predecessor of this project,
   written in Python. QJump (this project) is similar but it contains some improvements,
-  and since it's written in Nim (a compiled language), it ships as a single binary.
+  and since it's written in [Nim](https://nim-lang.org/) (a compiled language), it ships as a single binary.
   QuickJump is retired; use QJump instead.
