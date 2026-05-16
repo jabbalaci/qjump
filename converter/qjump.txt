@@ -1,0 +1,2 @@
+"nimony":     "~/Dropbox/nim/Nimony"
+"xcbasic":    "~/Dropbox/c64/XC=BASIC"
