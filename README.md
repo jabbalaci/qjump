@@ -15,6 +15,31 @@ Demo
 
 ![QJump in action](demo/demo.gif)
 
+After the bookmark, you can also specify a substring
+and you'll be redirected to the first subdirectory
+whose name contains this substring:
+
+```shell
+$ cd
+$ pwd
+/home/jabba
+
+$ qj nim
+$ pwd
+/home/jabba/Dropbox/nim
+
+$ cd
+$ pwd
+/home/jabba
+
+$ qj nim/26
+$ pwd
+/home/jabba/Dropbox/nim/Nim-2026
+```
+
+Here, only "`nim`" was present in the database. However,
+"`nim/26`" worked and the current directory was changed to "`.../nim/Nim-2026`".
+
 Motivation
 ----------
 
