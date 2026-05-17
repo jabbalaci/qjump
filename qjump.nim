@@ -37,7 +37,6 @@ import std/sequtils
 import std/sets
 import std/strformat
 import std/strutils
-import std/sugar
 import std/tables
 
 import helpers
@@ -49,7 +48,7 @@ proc myQuit(code: int) =
   quit(code)
 
 let
-  VERSION = "0.3.1"
+  VERSION = "0.3.2"
   HOME = getHomeDir().rstrip("/")
   DROPBOX = &"{HOME}/Dropbox"
   DB_FILE = &"{DROPBOX}/qjump.txt"
@@ -75,9 +74,14 @@ const SAMPLE_DB = """
 """.strip
 
 # Is the given key (bookmark) found or not?
-type Status = enum
-  stNotFound
-  stFound
+type
+  Status = enum
+    stNotFound
+    stFound
+
+  Check = enum
+    chDead,
+    chAlive
 
 # Entry #####################################################################
 
@@ -228,6 +232,26 @@ proc getUniqueHash(self: Database): string =
     if h notin keys:
       return h
 
+proc check(self: Database, what: Check) =
+  proc checkDead() =
+    for e in self.entries:
+      if e.isKeyPath:
+        if not dirExists(e.getRestoredPath):
+          stderr.writeLine(e.line)
+  #
+  proc checkAlive() =
+    for e in self.entries:
+      if not e.isKeyPath:
+        stderr.writeLine(e.line)
+      else:
+        if dirExists(e.getRestoredPath):
+          stderr.writeLine(e.line)
+  #
+  if what == chDead:
+    checkDead()
+  else:
+    checkAlive()
+
 proc dump(self: Database, to: File = stdout) =
   # Dump the database either to stdout, or to a file.
   for e in self.entries:
@@ -315,6 +339,8 @@ Provide an alias (bookmark) or use one of these options:
 -h, --help          show this help
 -v, --version       version info
 -l, --list          show list of available aliases
+-d, --dead          list dead (non-existing) paths
+-a, --alive         list existing paths
 """.strip
   to.writeLine(info)
 
@@ -365,6 +391,12 @@ proc main() =
     #
     if param in ["-l", "--list"]:
       db.dump(to=stderr)
+      myQuit(0)
+    if param in ["-d", "--dead"]:
+      db.check(chDead)
+      myQuit(0)
+    if param in ["-a", "--alive"]:
+      db.check(chAlive)
       myQuit(0)
     #
     let key = param.rstrip("/")
