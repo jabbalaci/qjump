@@ -40,6 +40,23 @@ $ pwd
 Here, only "`nim`" was present in the database. However,
 "`nim/26`" worked and the current directory was changed to "`.../nim/Nim-2026`".
 
+Help
+----
+```text
+QJump 0.3.2 by Jabba Laci (jabba.laci@gmail.com), 2026
+https://github.com/jabbalaci/qjump
+
+Usage: qj [alias] [option]
+
+Provide an alias (bookmark) or use one of these options:
+
+-h, --help          show this help
+-v, --version       version info
+-l, --list          show list of available aliases
+-d, --dead          list dead (non-existing) paths
+-a, --alive         list existing paths
+```
+
 Motivation
 ----------
 
