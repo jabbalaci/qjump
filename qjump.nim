@@ -48,7 +48,7 @@ proc myQuit(code: int) =
   quit(code)
 
 let
-  VERSION = "0.3.2"
+  VERSION = "0.3.3"
   HOME = getHomeDir().rstrip("/")
   DROPBOX = &"{HOME}/Dropbox"
   DB_FILE = &"{DROPBOX}/qjump.txt"
@@ -58,7 +58,8 @@ let
   # replace some prefixes in the paths:
   PREFIXES = {
     HOME: "~",
-    "/opt/_trash": "/trash"
+    "/opt/_trash": "/trash",
+    "/opt/_home_jabba": "~",
   }.toTable
 
 if EDITOR.len == 0:
@@ -188,15 +189,15 @@ proc findSimilarKeysV1(self: Database, key: string): seq[string] =
       result.add(e.key)
     #
   #
-  if result.len > 3: result[0 ..< 3] else: result
+  result.safeSlice(0, 3)
 
 proc findSimilarKeysV2(self: Database, key: string): seq[string] =
   # Using the Levenstein distance. Return the top 3 similarities.
   func myCmp(s, t: string): int =
     editDistance(s, key) - editDistance(t, key)
   #
-  let similar = sorted(self.getAllKeys(), myCmp)
-  if similar.len > 3: similar[0 ..< 3] else: similar
+  result = sorted(self.getAllKeys(), myCmp)
+  return result.safeSlice(0, 3)
 
 proc getPath(self: Database, key: string): (string, Status) =
   # Having the key, return the corresponding path.

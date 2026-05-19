@@ -33,3 +33,14 @@ proc getHash*(): string =
     h = hash(et).abs          # the hash can be a negative value, hence the abs()
   #
   &"{h:x}"
+
+proc safeSlice*[T](arr: openArray[T], lo, hi: int): auto =
+  ## Python-like (safe) slicing.
+  ## `lo` is included, `hi` is NOT included (like in Python)
+  if lo >= arr.len or lo > hi:
+    when T is char: return ""
+    else: return newSeq[T]()
+  # else:
+  let stop = if hi <= arr.len: hi else: arr.len
+  when T is char: return arr[lo ..< stop].join
+  else: return arr[lo ..< stop]
