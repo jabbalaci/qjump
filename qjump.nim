@@ -48,10 +48,10 @@ proc myQuit(code: int) =
   quit(code)
 
 let
-  VERSION = "0.3.3"
+  VERSION = "0.3.4"
   HOME = getHomeDir().rstrip("/")
-  DROPBOX = &"{HOME}/Dropbox"
-  DB_FILE = &"{DROPBOX}/qjump.txt"
+  DB_DIR = getEnv("DROPBOX", HOME).rstrip("/")
+  DB_FILE = &"{DB_DIR}/qjump.txt"
   TEMP_FILE = &"{DB_FILE}.tmp"
   # I suggest using an editor that starts in the terminal (vim, micro, etc.):
   EDITOR = getEnv("EDITOR", "")
@@ -334,6 +334,8 @@ QJump {VERSION} by Jabba Laci (jabba.laci@gmail.com), 2026
 https://github.com/jabbalaci/qjump
 
 Usage: qj [alias] [option]
+
+Location of DB file: {DB_FILE}
 
 Provide an alias (bookmark) or use one of these options:
 

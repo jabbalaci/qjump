@@ -43,10 +43,12 @@ Here, only "`nim`" was present in the database. However,
 Help
 ----
 ```text
-QJump 0.3.2 by Jabba Laci (jabba.laci@gmail.com), 2026
+QJump 0.3.4 by Jabba Laci (jabba.laci@gmail.com), 2026
 https://github.com/jabbalaci/qjump
 
 Usage: qj [alias] [option]
+
+Location of DB file: /home/jabba/Dropbox/qjump.txt
 
 Provide an alias (bookmark) or use one of these options:
 
@@ -66,8 +68,15 @@ QJump lets me change directories with the speed of light :)
 Installation
 ------------
 
-* In the source code (`qjump.nim`), modify the value of `DB_FILE`.
-  It contains the path of the database file that will be created.
+* The program tries to read the environment variable
+  `DROPBOX`. If it exists, then the database file
+  will be created inside your Dropbox folder, thus
+  you'll get auto synchronization. If this env. variable
+  doesn't exist, then the database file will be created
+  in your HOME folder. When you ask the help (`--help`),
+  the location of the database file will be printed.
+* If you're not satisfied with these default values,
+  then modify the value of `DB_FILE` in the source code.
   If you modify anything, don't forget to recompile the project (see the `Makefile`).
 * Add the content of `function.bash` / `function.zsh` / `function.fish` to your
   shell's settings file (depending on what shell you use).
